@@ -44,7 +44,7 @@ const Login = () => {
               className="outline-blue-500 border border-gray-400 px-4 py-2 rounded-full"
             />
             <div className="w-full text-center">
-              <button className="w-full bg-[#1d98f0] py-2 rounded-full text-gray-800 text-white">
+              <button className="w-full bg-[#1d98f0] py-2 rounded-full text-gray-800">
                 {isLogin ? "Create Account" : "Login"}
               </button>
             </div>
