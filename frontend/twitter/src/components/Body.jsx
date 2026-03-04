@@ -8,7 +8,7 @@ import Profile from "./Profile";
 const Body = () => {
   const appRouter = createBrowserRouter([
     {
-      path: "/home",
+      path: "/",
       element: <Home />,
       children: [
         {
@@ -16,7 +16,7 @@ const Body = () => {
           element: <Feed />,
         },
         {
-          path: "/home/profile",
+          path: "/profile/:id",
           element: <Profile />,
         },
       ],

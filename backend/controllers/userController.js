@@ -56,6 +56,7 @@ export const Login = async (req, res) => {
         const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET, { expiresIn: '1d' })
         return res.status(200).cookie('token', token, { expiresIn: '1d', httpOnly: true, maxAge: 24 * 60 * 60 * 1000, }).json({
             message: `Welcome back ${user.name}`,
+            user,
             success: true
         });
 
@@ -115,7 +116,7 @@ export const BookmarkTweet = async (req, res) => {
 
 export const getMyProfile = async (req, res) => {
     try {
-        const id = req.userId;
+        const id = req.params.id;
         const user = await User.findById(id).select("-password");
         if (!user) {
             return res.status(401).json({ message: 'User not found', success: false });
@@ -134,7 +135,7 @@ export const getMyProfile = async (req, res) => {
 
 export const getOtherUser = async (req, res) => {
     try {
-        const userId = req.userId;
+        const userId = req.params.id;
         const otherUser = await User.find({ _id: { $ne: userId } }).select("-password");
         if (!otherUser) {
             return res.status(401).json({ message: 'otheruser not found' });
@@ -175,3 +176,32 @@ export const follow = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+
+export const unfollow = async (req, res) => {
+    try {
+        const loggedInUserId = req.body.id;
+        const userId = req.params.id;
+
+        const loggedInUser = await User.findById(loggedInUserId);
+        const user = await User.findById(userId);
+
+        if (!loggedInUser.following.includes(userId)) {
+            return res.status(400).json({
+                message: "You are not following this user"
+            });
+        }
+
+        await user.updateOne({ $pull: { followers: loggedInUserId } });
+        await loggedInUser.updateOne({ $pull: { following: userId } });
+
+        return res.status(200).json({
+            success: true,
+            message: `${loggedInUser.name} unfollowed ${user.name}`
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+};
